@@ -1,4 +1,10 @@
 export interface ConfigApp {
-    'name': string | undefined;
-    'prefix': string | undefined;
+    name: string | any;
+    prefix: string | any;
+}
+
+export interface ConfigTheme {
+    colors: {
+        [key: string]: string
+    }
 }

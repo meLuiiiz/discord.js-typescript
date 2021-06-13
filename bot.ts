@@ -25,15 +25,16 @@ client.on('ready', async () => {
 })
 
 client.on('message', async (message: Message) => {
-    if (!message.content.startsWith('!') || message.author.bot) return;
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-    const args = message.content.slice('!'.length).trim().split(/ +/);
-    const command = args.shift()?.toLowerCase()
-
-	if (!client.commands.has(command)) return;
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const commandName = args.shift()?.toLowerCase()
 
 	try {
-		client.commands.get(command)?.execute(message, args);
+		const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
+        if (!command) return   
+        
+        command?.execute(client, message, args)
 	} catch (error) {
 		console.error(error);
     }

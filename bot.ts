@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
-import { Client, Collection, Message } from 'discord.js'
+import { Message } from 'discord.js'
+import { CustomClient } from './custom/discord'
 import fs from 'fs'
 
 config()
@@ -8,12 +9,11 @@ import './database/start'
 import { app } from './config/app'
 const { name, prefix } = app
 
-const client: Client = new Client()
-client.commands = new Collection();
+const client: CustomClient = new CustomClient()
 
-const commandFiles = fs.readdirSync('./src/Commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./src/Commands').filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 for (const file of commandFiles) {
-	const command = require(`./src/Commands/${file}`);
+    const command = require(`./src/Commands/${file}`);
 	client.commands.set(command.name, command);
 }
 
@@ -32,7 +32,7 @@ client.on('message', async (message: Message) => {
 
 	try {
 		const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))
-        if (!command) return   
+        if (!command) return
         
         command?.execute(client, message, args)
 	} catch (error) {
